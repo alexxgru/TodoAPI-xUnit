@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using BackendAPI1.data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,5 +27,6 @@ app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();
