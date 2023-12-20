@@ -71,7 +71,7 @@ namespace BackendAPI1.Controllers
             _context.SaveChanges();
         }
 
-        public void ChangeNote(Todo changeTodo)
+        public Todo ChangeNote(Todo changeTodo)
         {
             var todo = _context.Todos.FirstOrDefault(x => x.Id == changeTodo.Id);
 
@@ -82,8 +82,9 @@ namespace BackendAPI1.Controllers
 
             todo.isDone = changeTodo.isDone;
 
-
             _context.SaveChanges();
+
+            return todo;
         }
 
         public Todo DeleteNote(int Id)
