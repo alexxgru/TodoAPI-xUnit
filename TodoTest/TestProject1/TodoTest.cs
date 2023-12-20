@@ -117,10 +117,10 @@ namespace TodoAPI.tests.Tests
             await ResetContext();
             var todo = new Todo { Id = 12345, Text = "Test1", isDone = true };
             var service = new TodoService(_context);
-            service.AddTodo(todo);
+            var addedTodo = service.AddTodo(todo);
 
             // Act
-            var result = service.DeleteNote(_context.Todos.Single().Id);
+            var result = service.DeleteNote(addedTodo.Id);
 
             // Assert
             Assert.Equal(result.Text, todo.Text);
@@ -141,6 +141,25 @@ namespace TodoAPI.tests.Tests
             // Act
             //Id doesn't exist in db
             var result = Assert.Throws<Exception>(() => service.DeleteNote(1512512));
+        }
+
+        [Fact]
+        public async void Update_Note_Status_To_InComplete_Returns_Details()
+        {
+            // Arrange
+            await ResetContext();
+            var todo = new Todo { Id = 12345, Text = "Test1", isDone = true };
+            var service = new TodoService(_context);
+            var addedTodo = service.AddTodo(todo);
+
+            // Act
+            var result = service.ChangeNote(new Todo { Id = addedTodo.Id, Text = "Test1", isDone = false });
+
+            // Assert
+            Assert.False(result.isDone);
+
+            // Assert in database
+            Assert.False(_context.Todos.Single(x => x.Id == result.Id).isDone);
         }
     }
 }
