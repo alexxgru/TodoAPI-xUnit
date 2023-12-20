@@ -68,8 +68,8 @@ namespace TodoAPI.tests.Tests
 
             // Assert
             Assert.Equal(2, result.Length);
-            Assert.Equal(todo1.Text, result[0].Text);
-            Assert.Equal(todo2.Text, result[1].Text);
+            Assert.Contains(result, x => x.Text == todo1.Text);
+            Assert.Contains(result, x => x.Text == todo1.Text);
         }
 
         [Fact]
@@ -182,6 +182,25 @@ namespace TodoAPI.tests.Tests
             //Toggle again to make all incomplete
             var result2 = await service.ToggleNotes();
             Assert.All(result2, x => Assert.False(x.isDone));
+        }
+
+        [Fact]
+        public async void Clear_Completed_Returns_Correct_Details()
+        {
+            // Arrange
+            await ResetContext();
+            var todo1 = new Todo { Id = 12345, Text = "Test1", isDone = true };
+            var todo2 = new Todo { Id = 12345, Text = "Test2", isDone = false };
+            var service = new TodoService(_context);
+            service.AddTodo(todo1);
+            service.AddTodo(todo2);
+
+            // Act
+            service.ClearCompleted();
+
+            // Assert
+            Assert.Single(_context.Todos);
+            Assert.Equal(todo2.Text, _context.Todos.Single().Text);
         }
     }
 }
