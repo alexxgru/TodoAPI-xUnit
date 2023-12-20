@@ -1,6 +1,5 @@
 ﻿using BackendAPI1.data;
 using BackendAPI1.models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendAPI1.Controllers
@@ -20,20 +19,7 @@ namespace BackendAPI1.Controllers
         [HttpGet]
         public Todo[] OnGet(bool? completed)
         {
-            if (completed == true)
-            {
-                return _context.Todos.Where(x => x.isDone).ToArray();
-            }
-            else if (completed == false) 
-            {
-              return _context.Todos.Where(x => !x.isDone).ToArray();
-
-            }
-            else
-            {
-              return _context.Todos.ToArray();
-            }
-
+            return new TodoService(_context).GetNotes(completed);
         }
 
         [HttpGet, Route("/remaining")]
@@ -49,9 +35,7 @@ namespace BackendAPI1.Controllers
         {
             try
             {
-                Todo newTodo = new Todo { Text = todo.Text, isDone = todo.isDone };
-                _context.Todos.Add(newTodo);
-                _context.SaveChanges();
+                new TodoService(_context).AddTodo(todo);
                 return Ok();
             }
             catch
@@ -65,24 +49,9 @@ namespace BackendAPI1.Controllers
         {
             try
             {
-                var Todos = _context.Todos.ToArray();
-                if (Todos.All(x => x.isDone)) 
-                { 
-                    foreach (var todo in Todos)
-                    {
-                        todo.isDone = false;
-                    }
-                }
-                else
-                {
-                    foreach (var todo in Todos)
-                    {
-                        todo.isDone = true;
-                    }
-                }
-                _context.SaveChanges();
+                new TodoService(_context).ToggleNotes();
                 return Ok();
-            } 
+            }
             catch
             {
                 return StatusCode(500);
@@ -94,13 +63,11 @@ namespace BackendAPI1.Controllers
         {
             try
             {
-               var todos = _context.Todos.Where(x => x.isDone).ToArray();
-                _context.Todos.RemoveRange(todos);
-                _context.SaveChanges();
+                new TodoService(_context).ClearCompleted();
                 return Ok();
 
             }
-            catch 
+            catch
             {
                 return StatusCode(500);
             }
@@ -112,43 +79,24 @@ namespace BackendAPI1.Controllers
         {
             try
             {
-                var todo = _context.Todos.FirstOrDefault(x => x.Id == changeTodo.Id);
-
-                if (todo == null)
-                {
-                    throw new Exception("");
-                }
-                
-                todo.isDone = changeTodo.isDone;
-
-
-                _context.SaveChanges();
+                new TodoService(_context).ChangeNote(changeTodo);
                 return Ok();
             }
-            catch 
+            catch
             {
                 return StatusCode(500);
             }
         }
 
         [HttpDelete("{Id:int}")]
-        public IActionResult OnDelete(int Id) 
+        public IActionResult OnDelete(int Id)
         {
             try
             {
-                var todo = _context.Todos.FirstOrDefault(x => x.Id == Id);
-
-                if (todo == null)
-                {
-                    throw new Exception("");
-                }
-
-                _context.Remove(todo);
-
-                _context.SaveChanges();
+                new TodoService(_context).DeleteNote(Id);
                 return Ok();
             }
-            catch 
+            catch
             {
                 return StatusCode(500);
             }
