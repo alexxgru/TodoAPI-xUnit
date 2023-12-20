@@ -86,7 +86,7 @@ namespace BackendAPI1.Controllers
             _context.SaveChanges();
         }
 
-        public void DeleteNote(int Id)
+        public Todo DeleteNote(int Id)
         {
             var todo = _context.Todos.FirstOrDefault(x => x.Id == Id);
 
@@ -97,6 +97,7 @@ namespace BackendAPI1.Controllers
 
             _context.Remove(todo);
             _context.SaveChanges();
+            return todo;
         }
     }
 }

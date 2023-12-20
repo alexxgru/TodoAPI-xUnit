@@ -14,6 +14,7 @@ namespace TodoAPI.tests.Tests
             _context = new TodosContext(options);
         }
 
+        // Reset the database before each test
         private Task ResetContext()
         {
             _context.Todos.RemoveRange(_context.Todos);
@@ -107,6 +108,39 @@ namespace TodoAPI.tests.Tests
             // Assert
             Assert.Single(result);
             Assert.Equal(todo2.Text, result[0].Text);
+        }
+
+        [Fact]
+        public async void Delete_Todo_Returns_Details()
+        {
+            // Arrange
+            await ResetContext();
+            var todo = new Todo { Id = 12345, Text = "Test1", isDone = true };
+            var service = new TodoService(_context);
+            service.AddTodo(todo);
+
+            // Act
+            var result = service.DeleteNote(_context.Todos.Single().Id);
+
+            // Assert
+            Assert.Equal(result.Text, todo.Text);
+
+            // Assert that the todo is deleted from the database
+            Assert.Empty(_context.Todos);
+        }
+
+        [Fact]
+        public async void Delete_Todo_Invalid_Id_Throws_Exception()
+        {
+            // Arrange
+            await ResetContext();
+            var todo = new Todo { Id = 12345, Text = "Test1", isDone = true };
+            var service = new TodoService(_context);
+            service.AddTodo(todo);
+
+            // Act
+            //Id doesn't exist in db
+            var result = Assert.Throws<Exception>(() => service.DeleteNote(1512512));
         }
     }
 }
