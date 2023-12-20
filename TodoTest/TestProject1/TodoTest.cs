@@ -7,11 +7,19 @@ namespace TodoAPI.tests.Tests
 {
     public class TodoTest
     {
-        private readonly TodosContext _context;
+        private TodosContext _context;
         public TodoTest()
         {
             var options = new DbContextOptionsBuilder<TodosContext>().UseInMemoryDatabase("InMemory").Options;
             _context = new TodosContext(options);
+        }
+
+        private Task ResetContext()
+        {
+            _context.Todos.RemoveRange(_context.Todos);
+            _context.SaveChangesAsync();
+
+            return Task.CompletedTask;
         }
 
         [Fact]
@@ -41,6 +49,64 @@ namespace TodoAPI.tests.Tests
 
             // Act
             var result = Assert.Throws<NullReferenceException>(() => service.AddTodo(null!));
+        }
+
+        [Fact]
+        public async void List_All_Todos()
+        {
+            // Arrange
+            await ResetContext();
+            var todo1 = new Todo { Id = 12345, Text = "Test1", isDone = false };
+            var todo2 = new Todo { Id = 12345, Text = "Test2", isDone = false };
+            var service = new TodoService(_context);
+            service.AddTodo(todo1);
+            service.AddTodo(todo2);
+
+            // Act
+            var result = service.GetNotes(null);
+
+            // Assert
+            Assert.Equal(2, result.Length);
+            Assert.Equal(todo1.Text, result[0].Text);
+            Assert.Equal(todo2.Text, result[1].Text);
+        }
+
+        [Fact]
+        public async void List_Completed_Todos()
+        {
+            // Arrange
+            await ResetContext();
+            var todo1 = new Todo { Id = 12345, Text = "Test1", isDone = true };
+            var todo2 = new Todo { Id = 12345, Text = "Test2", isDone = false };
+            var service = new TodoService(_context);
+            service.AddTodo(todo1);
+            service.AddTodo(todo2);
+
+            // Act
+            var result = service.GetNotes(true);
+
+            // Assert
+            Assert.Single(result);
+            Assert.Equal(todo1.Text, result[0].Text);
+        }
+
+        [Fact]
+        public async void List_InComplete_Todos()
+        {
+            // Arrange
+            await ResetContext();
+            var todo1 = new Todo { Id = 12345, Text = "Test1", isDone = true };
+            var todo2 = new Todo { Id = 12345, Text = "Test2", isDone = false };
+            var service = new TodoService(_context);
+            service.AddTodo(todo1);
+            service.AddTodo(todo2);
+
+            // Act
+            var result = service.GetNotes(false);
+
+            // Assert
+            Assert.Single(result);
+            Assert.Equal(todo2.Text, result[0].Text);
         }
     }
 }
