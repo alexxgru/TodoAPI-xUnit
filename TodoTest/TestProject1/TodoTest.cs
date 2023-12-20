@@ -161,5 +161,27 @@ namespace TodoAPI.tests.Tests
             // Assert in database
             Assert.False(_context.Todos.Single(x => x.Id == result.Id).isDone);
         }
+
+        [Fact]
+        public async void Toggle_Notes_Returns_Correct_Details()
+        {
+            // Arrange
+            await ResetContext();
+            var todo1 = new Todo { Id = 12345, Text = "Test1", isDone = true };
+            var todo2 = new Todo { Id = 12345, Text = "Test2", isDone = false };
+            var service = new TodoService(_context);
+            service.AddTodo(todo1);
+            service.AddTodo(todo2);
+
+            // Act/Assert
+
+            // Toggle once to complete all
+            var result = await service.ToggleNotes();
+            Assert.All(result, x => Assert.True(x.isDone));
+
+            //Toggle again to make all incomplete
+            var result2 = await service.ToggleNotes();
+            Assert.All(result2, x => Assert.False(x.isDone));
+        }
     }
 }

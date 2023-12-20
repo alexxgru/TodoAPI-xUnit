@@ -44,7 +44,7 @@ namespace BackendAPI1.Controllers
             return newTodo;
         }
 
-        public void ToggleNotes()
+        public async Task<Todo[]> ToggleNotes()
         {
             var Todos = _context.Todos.ToArray();
             if (Todos.All(x => x.isDone))
@@ -61,7 +61,9 @@ namespace BackendAPI1.Controllers
                     todo.isDone = true;
                 }
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            return Todos;
         }
 
         public void ClearCompleted()
