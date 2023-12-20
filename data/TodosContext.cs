@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using BackendAPI1.models;
+﻿using BackendAPI1.models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendAPI1.data
 {
@@ -13,6 +13,10 @@ namespace BackendAPI1.data
         public TodosContext()
         {
         }
-        public DbSet<Todo> Todos { get; set;} 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        }
+
+        public DbSet<Todo> Todos { get; set; }
     }
 }
