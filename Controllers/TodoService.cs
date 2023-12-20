@@ -30,11 +30,18 @@ namespace BackendAPI1.Controllers
             }
         }
 
-        public void AddTodo(Todo todo)
+        public Todo AddTodo(Todo todo)
         {
+            if (string.IsNullOrWhiteSpace(todo.Text) || todo is null)
+            {
+                throw new NullReferenceException("Invalid todo");
+            }
+
             Todo newTodo = new Todo { Text = todo.Text, isDone = todo.isDone };
             _context.Todos.Add(newTodo);
             _context.SaveChanges();
+
+            return newTodo;
         }
 
         public void ToggleNotes()
